@@ -27,8 +27,8 @@ export default function handler(req, res) {
      const data = Array.from(iterator)
 
      const courseData = data[0].values
-     console.log(`courseData = ${courseData}`)
-     console.log(`currentDate = ${currentDate}`)
+     //console.log(`courseData = ${courseData}`)
+     //console.log(`currentDate = ${currentDate}`)
 
      let relevantCourses = []
      courseData.forEach((course) => {
@@ -48,15 +48,15 @@ export default function handler(req, res) {
            startDate = startDate2014J
            break
        }
-         console.log(`startDate = ${startDate}`)
+         //console.log(`startDate = ${startDate}`)
        const endDate = getEndDate(startDate, course[2])
-       console.log(`endDate = ${endDate}`)
+       //console.log(`endDate = ${endDate}`)
 
        // only return courses that are currently taking place
        if(startDate <= currentDate && currentDate <= endDate)
          relevantCourses.push(course)
      })
-     console.log(relevantCourses)
+     //console.log(relevantCourses)
      db.close()
      return res.status(200).json({ data : relevantCourses })
    })

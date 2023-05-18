@@ -11,7 +11,7 @@ export default function Assessments() {
 
     useEffect(() => {
         fetchData().then(response => response.json()).then(res => {
-            //console.log(data.data[0]);
+            console.log(res);
             setAssessments(res.data)
         });
     }, []);
@@ -27,7 +27,7 @@ export default function Assessments() {
     return (
         <div className="flex">
             {assessments.map((assessment) =>
-                <AssessmentCard assessment={assessment}/>
+                <AssessmentCard assessment={assessment} key={assessment[0]}/>
             )}
         </div>
     )

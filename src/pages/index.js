@@ -25,8 +25,9 @@ export default function Home() {
         <h1 className="font-bold">Hello, User. Today is {date}</h1>
         <h2>My courses:</h2>
         <Courses/>
-        <h2>My assessments:</h2>
+        <h2>Next assessments:</h2>
         <Assessments/>
+        <h2>Performance in previous assessments:</h2>
       </div>
 
 
