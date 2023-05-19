@@ -1,39 +1,37 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 const fs = require("fs");
 const initSqlJs = require("sql.js");
 
-// TODO: remove dates when not needed?
-// old constants for course start dates
-/*const startDate2013B = new Date(2013, 1, 1)
-const startDate2013J = new Date(2013, 9, 1)
-const startDate2014B = new Date(2014, 1, 1)
-const startDate2014J = new Date(2014, 9, 1)*/
-
-// constants for course start dates
-const startDate2013B = "2013-02-01";
-const startDate2013J = "2013-10-01";
-const startDate2014B = "2014-02-01";
-const startDate2014J = "2014-10-01";
-
-// setting current date
 const currentDate = process.env.CURRENT_DATE;
 const idStudent = process.env.ID_STUDENT;
 
-const assessmentsQuery = `SELECT si.code_module, si.code_presentation, a.date, a.id_assessment FROM assessments a
+const coursesQuery = `SELECT id_student
+FROM studentRegistration
+WHERE id_student = ${idStudent}
+  AND (date_registration <= date('${currentDate}') 
+  AND (date_unregistration > date('${currentDate}') OR date_unregistration IS NULL))
+  AND date('${currentDate}') < (
+  SELECT
+    CASE c.code_presentation
+            WHEN '2013B' THEN date('2013-02-01', '+' || c.module_presentation_length || ' days')
+            WHEN '2013J' THEN date('2013-10-01', '+' || c.module_presentation_length || ' days')
+            WHEN '2014B' THEN date('2014-02-01', '+' || c.module_presentation_length || ' days')
+            WHEN '2014J' THEN date('2014-10-01', '+' || c.module_presentation_length || ' days')
+        END AS module_end_date
+    FROM courses c
+  INNER JOIN studentRegistration sr
+  ON sr.code_module = c.code_module AND sr.code_presentation = c.code_presentation
+  WHERE sr.id_student = ${idStudent}
+)`;
+
+const assessmentsQuery = `SELECT si.code_module, si.code_presentation, a.date, a.id_assessment, a.assessment_type FROM assessments a
+INNER JOIN studentInfo si ON a.code_module = si.code_module AND a.code_presentation = si.code_presentation
+WHERE si.id_student IN (${coursesQuery}) AND a.date >= '${currentDate}'
+ORDER BY a.date ASC`;
+
+const oldQuery = `SELECT si.code_module, si.code_presentation, a.date, a.id_assessment, a.assessment_type FROM assessments a
 INNER JOIN studentInfo si ON a.code_module = si.code_module AND a.code_presentation = si.code_presentation
 WHERE si.id_student = ${idStudent} AND a.date >= '${currentDate}'
-ORDER BY a.date ASC
-LIMIT 2`;
-
-const oldQuery = `
-    SELECT s.code_module, s.code_presentation, a.id_assessment, a.assessment_type, a.date, a.weight, sa.score
-    FROM studentInfo s
-    INNER JOIN courses c ON s.code_module = c.code_module AND s.code_presentation = c.code_presentation
-    INNER JOIN assessments a ON s.code_module = a.code_module AND s.code_presentation = a.code_presentation
-    INNER JOIN studentAssessment sa ON a.id_assessment = sa.id_assessment AND s.id_student = sa.id_student
-    WHERE s.id_student = ${idStudent}
-    ORDER BY s.code_module, s.code_presentation, a.id_assessment;
-`;
+ORDER BY a.date ASC`;
 
 // TODO: move to own module?
 async function connectToDb() {
@@ -45,14 +43,15 @@ async function connectToDb() {
 
 export default function handler(req, res) {
   const db = connectToDb().then((db) => {
+    let assessmentData;
     const result = db.exec(assessmentsQuery);
-    const iterator = result.values();
-    const data = Array.from(iterator);
+    if (result.length !== 0) {
+      const iterator = result.values();
+      const data = Array.from(iterator);
+      assessmentData = data[0].values;
+    } else assessmentData = [];
 
-    console.log(data);
-    const assessmentData = data[0].values;
-
-    console.log(`assessmentData = ${assessmentData}`);
+    //console.log(`assessmentData = ${assessmentData}`);
     db.close();
     return res.status(200).json({ data: assessmentData });
   });

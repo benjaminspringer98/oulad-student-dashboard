@@ -9,6 +9,7 @@ export default function AssessmentCard({ assessment }) {
       </h6>
       <h6>{assessment[2]}</h6>
       <h6>{assessment[3]}</h6>
+      <h6>{assessment[4]}</h6>
     </div>
   );
 }

@@ -13,7 +13,7 @@ export default function PerformanceDisplay() {
     fetchData()
       .then((response) => response.json())
       .then((res) => {
-        console.log(res.data);
+        //console.log(res.data);
         //setAssessmentResults(res.data);
         setTestData({
           datasets: [
