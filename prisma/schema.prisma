@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:/Users/benni/Dev/databases/OULAD/OULAD.db"
+}
+
+model courses {
+  code_module                String
+  code_presentation          String
+  module_presentation_length Int
+  vle                        vle[]
+  studentInfo                studentInfo[]
+  studentRegistration        studentRegistration[]
+  studentVle                 studentVle[]
+  assessments                assessments[]
+
+  @@id([code_module, code_presentation])
+}
+
+model assessments {
+  course            courses @relation(fields: [code_module, code_presentation], references: [code_module, code_presentation])
+  code_module       String
+  code_presentation String
+  id_assessment            Int                 @id
+  assessment_type          String
+  date                     String
+  weight                   Int
+  studentAssessment        studentAssessment[]
+}
+
+model student {
+  id_student          Int                   @id
+  studentInfo         studentInfo[]
+  studentAssessment   studentAssessment[]
+  studentRegistration studentRegistration[]
+  studentVle          studentVle[]
+}
+
+model vle {
+  id_site                  Int          @id
+  course                   courses      @relation(fields: [code_module, code_presentation], references: [code_presentation, code_module])
+  code_module       String
+  code_presentation String
+  activity_type            String
+  week_from                String?
+  week_to                  String?
+  studentVle               studentVle[]
+}
+
+model studentInfo {
+  course               courses @relation(fields: [code_module, code_presentation], references: [code_presentation, code_module])
+  code_module          String
+  code_presentation    String
+  student              student @relation(fields: [id_student], references: [id_student])
+  id_student           Int
+  gender               String
+  region               String
+  highest_education    String
+  imd_band             String
+  age_band             String
+  num_of_prev_attempts Int
+  studied_credits      Int
+  disability           String
+  final_result         String
+
+  @@id([code_module, code_presentation, id_student])
+}
+
+model studentAssessment {
+  assessment     assessments? @relation(fields: [id_assessment], references: [id_assessment])
+  id_assessment  Int
+  student        student     @relation(fields: [id_student], references: [id_student])
+  id_student     Int
+  date_submitted String?
+  is_banked      Int?
+  score          Int?
+
+  @@id([id_assessment, id_student])
+}
+
+model studentRegistration {
+  course              courses @relation(fields: [code_module, code_presentation], references: [code_module, code_presentation])
+  code_module         String
+  code_presentation   String
+  student             student @relation(fields: [id_student], references: [id_student])
+  id_student          Int
+  date_registration   String
+  date_unregistration String?
+
+  @@id([code_module, code_presentation, id_student])
+}
+
+model studentVle {
+  course            courses @relation(fields: [code_module, code_presentation], references: [code_module, code_presentation])
+  code_module       String
+  code_presentation String
+  student           student @relation(fields: [id_student], references: [id_student])
+  id_student        Int
+  vle               vle     @relation(fields: [id_site], references: [id_site])
+  id_site           Int
+  date              String
+  sum_click         Int
+
+  @@id([code_module, code_presentation, id_student, id_site])
+}

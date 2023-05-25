@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 
 export default function Assessments() {
   async function fetchData() {
-    return await fetch("/api/getAssessments");
+    return await fetch("/api/v1/getAssessments");
   }
 
   const [assessments, setAssessments] = useState();
@@ -13,7 +13,7 @@ export default function Assessments() {
     fetchData()
       .then((response) => response.json())
       .then((res) => {
-        //console.log(res);
+        console.log(res.data);
         setAssessments(res.data);
       });
   }, []);

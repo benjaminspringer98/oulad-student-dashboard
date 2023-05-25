@@ -1,11 +1,10 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 const fs = require("fs");
 const initSqlJs = require("sql.js");
 
 const currentDate = process.env.CURRENT_DATE;
 const idStudent = process.env.ID_STUDENT;
 
-const coursesQuery = `SELECT *
+const coursesQuery = `SELECT id_student
 FROM studentRegistration
 WHERE id_student = ${idStudent}
   AND (date_registration <= date('${currentDate}') 
@@ -24,12 +23,15 @@ WHERE id_student = ${idStudent}
   WHERE sr.id_student = ${idStudent}
 )`;
 
-const oldCoursesQuery = `SELECT *
-FROM studentRegistration
-WHERE id_student = ${idStudent}
-  AND (date_registration <= '${currentDate}' AND (date_unregistration > '${currentDate}' OR date_unregistration IS NULL));
-`;
+/*const assessmentsQuery = ` SELECT * FROM assessments
+ WHERE code_module IN (${coursesQuery}) AND code_presentation IN (${coursesQuery})`;*/
 
+const assessmentsQuery = `SELECT si.code_module, si.code_presentation, a.date, a.id_assessment, a.assessment_type FROM assessments a
+INNER JOIN studentInfo si ON a.code_module = si.code_module AND a.code_presentation = si.code_presentation
+WHERE si.id_student IN (${coursesQuery}) AND a.date >= '${currentDate}'
+ORDER BY a.date ASC`;
+
+// TODO: move to own module?
 async function connectToDb() {
   const filebuffer = fs.readFileSync(process.env.DB_PATH);
   const SQL = await initSqlJs();
@@ -39,17 +41,16 @@ async function connectToDb() {
 
 export default function handler(req, res) {
   const db = connectToDb().then((db) => {
-    let courseData;
-    const result = db.exec(coursesQuery);
+    let assessmentData;
+    const result = db.exec(assessmentsQuery);
     if (result.length !== 0) {
       const iterator = result.values();
       const data = Array.from(iterator);
-      console.log(`data = ${data}`);
-      courseData = data[0].values;
-    } else courseData = [];
+      assessmentData = data[0].values;
+    } else assessmentData = [];
 
+    //console.log(`assessmentData = ${assessmentData}`);
     db.close();
-    console.log(`courseData = ${courseData}`);
-    return res.status(200).json({ data: courseData });
+    return res.status(200).json({ data: assessmentData });
   });
 }

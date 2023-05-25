@@ -7,7 +7,7 @@ export default function Courses() {
 
   // get all courses
   async function fetchData() {
-    return await fetch("/api/getCourses");
+    return await fetch("/api/v1/getCourses");
   }
 
   const [courses, setCourses] = useState();
@@ -16,7 +16,7 @@ export default function Courses() {
     fetchData()
       .then((response) => response.json())
       .then((res) => {
-        console.log(`courseData = ${res.data}`);
+        //console.log(`courseData = ${res.data}`);
         setCourses(res.data);
       });
   }, []);
