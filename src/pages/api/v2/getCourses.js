@@ -2,7 +2,9 @@ import { PrismaClient } from "@prisma/client";
 
 const currentDate = process.env.CURRENT_DATE;
 export default function handler(req, res) {
-  const prism = getRegisteredCourses(Number(process.env.ID_STUDENT));
+  const prism = getRegisteredCourses(
+    Number(process.env.NEXT_PUBLIC_ID_STUDENT)
+  );
   prism.then((data) => {
     return res.status(200).json({ data });
   });

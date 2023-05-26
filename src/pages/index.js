@@ -6,6 +6,8 @@ import PerformanceDisplay from "@/components/PerformanceDisplay";
 import CoursesDisplay from "@/components/CoursesDisplay";
 import RegisteredCourses from "@/components/v2/RegisteredCourses";
 import NextAssessments from "@/components/v2/NextAssessments";
+import AssessmentPerformance from "@/components/v2/AssessmentPerformance";
+import AssessmentVsVleInteraction from "@/components/v2/AssessmentVsVleInteraction";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,6 +32,8 @@ export default function Home() {
       <h1 className="font-bold">Hello, User. Today is {date}</h1>
       <RegisteredCourses />
       <NextAssessments />
+      <AssessmentPerformance />
+      <AssessmentVsVleInteraction />
       {/*<h2>My courses:</h2>
       <Courses />
        <h2>Next assessments:</h2>

@@ -2,16 +2,18 @@ import { PrismaClient } from "@prisma/client";
 
 const currentDate = process.env.CURRENT_DATE;
 export default function handler(req, res) {
-  const prism = getAssessments(Number(process.env.NEXT_PUBLIC_ID_STUDENT));
+  const prism = getAssessmentPerformance(
+    Number(process.env.NEXT_PUBLIC_ID_STUDENT)
+  );
   prism.then((data) => {
     return res.status(200).json({ data });
   });
 }
 
-async function getAssessments(studentId) {
+async function getAssessmentPerformance(studentId) {
   const prisma = new PrismaClient();
 
-  const assessments = await prisma.studentRegistration.findMany({
+  const assessmentPerformance = await prisma.studentRegistration.findMany({
     where: {
       AND: [
         {
@@ -40,24 +42,20 @@ async function getAssessments(studentId) {
       course: {
         include: {
           assessments: {
-            take: 1,
             where: {
               date: {
-                gte: currentDate,
+                lte: currentDate,
               },
             },
             include: {
-              studentAssessment: {
-                where: {
-                  id_student: studentId,
-                },
-              },
+              studentAssessment: true,
             },
           },
+          /*studentVle: true,*/
         },
       },
     },
   });
 
-  return assessments;
+  return assessmentPerformance;
 }
