@@ -67,8 +67,7 @@ const AssessmentPerformance = () => {
     return <div>No data</div>;
   }
 
-  // TODO: is returning 0 the best option when student has not handed in assessment?
-  // TODO: some exams have no grading, thus the mean score cant be calculated, should they be excluded from the chart?
+  // TODO: is returning undefined the best option when student has not handed in assessment? leaves empty spaces in graph
 
   return (
     <div>
@@ -79,6 +78,20 @@ const AssessmentPerformance = () => {
             key={course.id}
             title="Title"
             options={{
+              scales: {
+                x: {
+                  title: {
+                    display: true,
+                    text: "Assessment ID",
+                  },
+                },
+                y: {
+                  title: {
+                    display: true,
+                    text: "Score",
+                  },
+                },
+              },
               plugins: {
                 title: {
                   display: true,
@@ -96,7 +109,9 @@ const AssessmentPerformance = () => {
                         sa.id_student ===
                         Number(process.env.NEXT_PUBLIC_ID_STUDENT)
                     );
-                    return studentAssessment ? studentAssessment.score : 0;
+                    return studentAssessment
+                      ? studentAssessment.score
+                      : undefined;
                   }),
                 },
                 {
@@ -108,8 +123,11 @@ const AssessmentPerformance = () => {
                   ),
                 },
               ],
-              labels: course.course.assessments.map(
-                (assessment) => assessment.id_assessment
+              labels: course.course.assessments.map((assessment) =>
+                assessment.assessment_type === "Exam" &&
+                assessment.studentAssessment.length === 0
+                  ? "Pass/Fail exam"
+                  : assessment.id_assessment
               ),
             }}
           />

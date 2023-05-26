@@ -36,6 +36,28 @@ const AssessmentVsVleInteraction = () => {
             key={course.id}
             title="Title"
             options={{
+              responsive: true,
+              scales: {
+                x: {
+                  stacked: true,
+                  title: {
+                    display: true,
+                    text: "VLE ID",
+                  },
+                  ticks: {
+                    font: {
+                      size: 10,
+                    },
+                  },
+                },
+                y: {
+                  stacked: false,
+                  title: {
+                    display: true,
+                    text: "Mean actions until today",
+                  },
+                },
+              },
               indexAxis: "x",
               plugins: {
                 title: {
