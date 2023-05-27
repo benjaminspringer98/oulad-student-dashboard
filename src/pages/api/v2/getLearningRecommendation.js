@@ -80,6 +80,7 @@ async function getLearningRecommendation(studentId) {
     // get ids of students who were >= 10% better than current student
     // first get all unique studentIds
     // TODO: uniqueStudents getStudentMeanScore calculated wrong mean, check if function works properly (means seem lower than when manually checking sqlite)
+    // TODO: solution: the difference is caused by the division through assessments.length. This also factors in exam grades, which scores are not in studentAssessment, but in studentInfo
     const uniqueStudents = getUniqueStudentIds(
       course.course.assessments,
       studentId
