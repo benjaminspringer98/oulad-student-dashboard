@@ -1,7 +1,7 @@
 const fs = require("fs");
 const initSqlJs = require("sql.js");
 
-const currentDate = process.env.CURRENT_DATE;
+const currentDate = process.env.NEXT_PUBLIC_CURRENT_DATE;
 const idStudent = process.env.ID_STUDENT;
 
 const coursesQuery = `SELECT id_student

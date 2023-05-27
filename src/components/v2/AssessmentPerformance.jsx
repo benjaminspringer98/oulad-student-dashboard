@@ -86,6 +86,7 @@ const AssessmentPerformance = () => {
                   },
                 },
                 y: {
+                  beginAtZero: true,
                   title: {
                     display: true,
                     text: "Score",

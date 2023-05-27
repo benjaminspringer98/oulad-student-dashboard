@@ -2,7 +2,7 @@
 const fs = require("fs");
 const initSqlJs = require("sql.js");
 
-const currentDate = new Date(process.env.CURRENT_DATE);
+const currentDate = new Date(process.env.NEXT_PUBLIC_CURRENT_DATE);
 const idStudent = process.env.ID_STUDENT;
 
 const assessmentResultsQuery = `SELECT a.id_assessment, a.assessment_type, a.date AS assessment_date, sa.score,

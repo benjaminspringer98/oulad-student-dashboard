@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import assessmentPerformance from "@/components/v2/AssessmentPerformance";
 
-const currentDate = process.env.CURRENT_DATE;
+const currentDate = process.env.NEXT_PUBLIC_CURRENT_DATE;
 export default function handler(req, res) {
   const prism = getAssessmentPerformance(
     Number(process.env.NEXT_PUBLIC_ID_STUDENT)

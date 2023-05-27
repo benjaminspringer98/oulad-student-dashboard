@@ -8,6 +8,7 @@ import RegisteredCourses from "@/components/v2/RegisteredCourses";
 import NextAssessments from "@/components/v2/NextAssessments";
 import AssessmentPerformance from "@/components/v2/AssessmentPerformance";
 import AssessmentVsVleInteraction from "@/components/v2/AssessmentVsVleInteraction";
+import LearningRecommendation from "@/components/v2/LearningRecommendation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,15 +34,10 @@ export default function Home() {
       <RegisteredCourses />
       <NextAssessments />
       <AssessmentPerformance />
+      {/*
       <AssessmentVsVleInteraction />
-      {/*<h2>My courses:</h2>
-      <Courses />
-       <h2>Next assessments:</h2>
-      <Assessments />
-      <h2>Performance in previous assessments:</h2>
-      <PerformanceDisplay />
-
-      <CoursesDisplay></CoursesDisplay>*/}
+*/}
+      <LearningRecommendation />
     </div>
   );
 }
