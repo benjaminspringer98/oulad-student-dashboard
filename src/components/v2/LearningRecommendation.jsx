@@ -23,4 +23,25 @@ export default function LearningRecommendation() {
   if (data.length === 0) {
     return <div>No data</div>;
   }
+
+  return (
+    <div>
+      {data.map((course) => (
+        <div>
+          <h3>
+            Course: {`${course.code_module} ${course.code_presentation} `}
+          </h3>
+          <ul>
+            {course.highestDifferencePairs.map((pair) => (
+              <li>
+                Students that are 10% better have on average{" "}
+                {Math.round(pair.difference)} more interactions in VLE{" "}
+                {pair.key}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
 }

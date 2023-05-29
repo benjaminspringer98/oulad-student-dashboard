@@ -15,6 +15,7 @@ const inter = Inter({ subsets: ["latin"] });
 export default function Home() {
   const [date, setDate] = useState();
 
+  // TODO: cleanup whole app
   async function getCurrentDate() {
     return await fetch("/api/v2/getCurrentDate");
   }

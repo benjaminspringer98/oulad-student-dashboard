@@ -65,6 +65,8 @@ async function getLearningRecommendation(studentId) {
     },
   });
 
+  // TODO: for frontend: could include vle activity_type to show different icons in frontend
+
   const learningRecommendationsForCourses = [];
   data.forEach((course) => {
     // get mean score of current student
@@ -81,6 +83,7 @@ async function getLearningRecommendation(studentId) {
     console.log(`uniqueStudents length: ${uniqueStudents.length}`);
 
     // get ids of students who were >= percentage better than current student
+    // TODO: what happens when no students are better than current student?
     let studentsBetterThanCurrent = [];
     uniqueStudents.forEach((idStudent) => {
       const meanScore = getStudentMeanScore(
@@ -109,24 +112,94 @@ async function getLearningRecommendation(studentId) {
       [studentId]
     );
 
-    // TODO: hardest part: identify trends
-    // maybe just get mean of vle interactions of other students for each id_site and
-    // compare it to the current student's mean vle interactions for each id_site
-    // where the difference is biggest, that's where the current student should focus on
-    // This is to some extend already in getAssessmentVsVleInteraction.js
-    // Problem: How will the mean be calculated, i.e. by what is divided?
+    const totalClicksPerSiteBetterStudents = getTotalClicksPerSite(
+      vleInteractionsByStudent
+    );
+    const totalClicksPerSiteCurrentStudent = getTotalClicksPerSite(
+      currentStudentVleInteractions
+    );
+
+    // divide by number of studentsBetterThanCurrent to get average clicks per site
+    for (let id_site in totalClicksPerSiteBetterStudents) {
+      if (totalClicksPerSiteBetterStudents.hasOwnProperty(id_site)) {
+        totalClicksPerSiteBetterStudents[id_site] =
+          totalClicksPerSiteBetterStudents[id_site] /
+          studentsBetterThanCurrent.length;
+      }
+    }
+
+    const highestDifferencePairs = getHighestDifferencePairs(
+      totalClicksPerSiteBetterStudents,
+      totalClicksPerSiteCurrentStudent,
+      3
+    );
 
     const learningRecommendationsForCourse = {
       code_module: course.course.code_module,
       code_presentation: course.course.code_presentation,
-      vleInteractionsByStudent: vleInteractionsByStudent,
+      /*vleInteractionsByStudent: vleInteractionsByStudent,
       currentStudentVleInteractions: currentStudentVleInteractions,
+      totalClicksPerSiteBetterStudents: totalClicksPerSiteBetterStudents,
+      totalClicksPerSiteCurrentStudent: totalClicksPerSiteCurrentStudent*/
+      highestDifferencePairs: highestDifferencePairs,
     };
 
     learningRecommendationsForCourses.push(learningRecommendationsForCourse);
   });
 
   return learningRecommendationsForCourses;
+}
+
+function getHighestDifferencePairs(
+  totalClicksPerSiteBetterStudents,
+  totalClicksPerSiteCurrentStudent,
+  n
+) {
+  // Create an array to store the pairs
+  const pairs = [];
+
+  // Iterate over the keys in the first object
+  for (const key in totalClicksPerSiteBetterStudents) {
+    // Check if the key exists in the second object
+    if (totalClicksPerSiteCurrentStudent.hasOwnProperty(key)) {
+      // Calculate the difference in values
+      const betterStudentValue = totalClicksPerSiteBetterStudents[key];
+      const currentStudentValue = totalClicksPerSiteCurrentStudent[key];
+      const difference = betterStudentValue - currentStudentValue;
+
+      // Add the pair to the array
+      pairs.push({
+        key,
+        betterStudentValue,
+        currentStudentValue,
+        difference,
+      });
+    }
+  }
+
+  // Sort the pairs based on the difference in descending order
+  pairs.sort((a, b) => b.difference - a.difference);
+
+  // Return the first N pairs
+  return pairs.slice(0, n);
+}
+
+function getTotalClicksPerSite(vleInteractions) {
+  const totalClicksPerSite = {};
+  vleInteractions.forEach((interaction) => {
+    interaction.vleInteractions.forEach((vleInteraction) => {
+      const idSite = vleInteraction.id_site;
+      const totalSumClicks = vleInteraction.total_sum_clicks;
+
+      if (idSite in totalClicksPerSite) {
+        totalClicksPerSite[idSite] += totalSumClicks;
+      } else {
+        totalClicksPerSite[idSite] = totalSumClicks;
+      }
+    });
+  });
+
+  return totalClicksPerSite;
 }
 
 function calculateVleInteractions(studentVle, studentIds) {
