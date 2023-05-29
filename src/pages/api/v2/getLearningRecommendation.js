@@ -65,28 +65,22 @@ async function getLearningRecommendation(studentId) {
     },
   });
 
+  const learningRecommendationsForCourses = [];
   data.forEach((course) => {
-    const courseObject = {
-      code_module: course.course.code_module,
-      code_presentation: course.course.code_presentation,
-    };
-
     // get mean score of current student
     const studentMeanScore = getStudentMeanScore(
       course.course.assessments,
       studentId
     );
 
-    // get ids of students who were >= 10% better than current student
     // first get all unique studentIds
-    // TODO: uniqueStudents getStudentMeanScore calculated wrong mean, check if function works properly (means seem lower than when manually checking sqlite)
-    // TODO: solution: the difference is caused by the division through assessments.length. This also factors in exam grades, which scores are not in studentAssessment, but in studentInfo
     const uniqueStudents = getUniqueStudentIds(
       course.course.assessments,
       studentId
     );
     console.log(`uniqueStudents length: ${uniqueStudents.length}`);
 
+    // get ids of students who were >= percentage better than current student
     let studentsBetterThanCurrent = [];
     uniqueStudents.forEach((idStudent) => {
       const meanScore = getStudentMeanScore(
@@ -102,14 +96,98 @@ async function getLearningRecommendation(studentId) {
         studentsBetterThanCurrent.push(idStudent);
       }
     });
+
+    // get all vle mean interactions of students who were >= percentage better than current student
+    // i.e. [{id_student: 1, vleInteractions: [{id_site: 1337, total_sum_clicks: 59} {id_site: 1338, total_sum_clicks: 33}], ...]
+    const vleInteractionsByStudent = calculateVleInteractions(
+      course.course.studentVle,
+      studentsBetterThanCurrent
+    );
+
+    const currentStudentVleInteractions = calculateVleInteractions(
+      course.course.studentVle,
+      [studentId]
+    );
+
+    // TODO: hardest part: identify trends
+    // maybe just get mean of vle interactions of other students for each id_site and
+    // compare it to the current student's mean vle interactions for each id_site
+    // where the difference is biggest, that's where the current student should focus on
+    // This is to some extend already in getAssessmentVsVleInteraction.js
+    // Problem: How will the mean be calculated, i.e. by what is divided?
+
+    const learningRecommendationsForCourse = {
+      code_module: course.course.code_module,
+      code_presentation: course.course.code_presentation,
+      vleInteractionsByStudent: vleInteractionsByStudent,
+      currentStudentVleInteractions: currentStudentVleInteractions,
+    };
+
+    learningRecommendationsForCourses.push(learningRecommendationsForCourse);
   });
 
-  return data;
+  return learningRecommendationsForCourses;
+}
+
+function calculateVleInteractions(studentVle, studentIds) {
+  let output = [];
+
+  const filteredStudentVle = studentVle.filter((vle) =>
+    studentIds.includes(vle.id_student)
+  );
+
+  for (let entry of filteredStudentVle) {
+    let id_student = entry.id_student;
+    let id_site = entry.id_site;
+    let sum_click = entry.sum_click;
+
+    // Check if the student already exists in the output list
+    let studentExists = false;
+    for (let student of output) {
+      if (student.id_student === id_student) {
+        studentExists = true;
+        let vleInteractions = student.vleInteractions;
+
+        // Check if the vle_interaction with the same id_site already exists
+        let vleInteractionExists = false;
+        for (let vleInteraction of vleInteractions) {
+          if (vleInteraction.id_site === id_site) {
+            vleInteraction.total_sum_clicks += sum_click;
+            vleInteractionExists = true;
+            break;
+          }
+        }
+
+        // If the vle_interaction doesn't exist, create a new one
+        if (!vleInteractionExists) {
+          vleInteractions.push({
+            id_site: id_site,
+            total_sum_clicks: sum_click,
+          });
+        }
+        break;
+      }
+    }
+
+    // If the student doesn't exist, create a new student entry
+    if (!studentExists) {
+      output.push({
+        id_student: id_student,
+        vleInteractions: [{ id_site: id_site, total_sum_clicks: sum_click }],
+      });
+    }
+  }
+
+  return output;
 }
 
 function getStudentMeanScore(assessments, studentId) {
   let assessmentScoresStudent = 0;
-  let numberOfAssessments = assessments.length;
+
+  // always divide by total number of course assessments, not by number of assessments that student has handed in
+  let numberOfAssessments = assessments.filter(
+    (a) => a.assessment_type !== "Exam" // exclude exam scores, as they are in studentInfo, not studentAssessment
+  ).length;
 
   for (let i = 0; i < assessments.length; i++) {
     const assessment = assessments[i];

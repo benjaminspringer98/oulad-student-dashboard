@@ -35,8 +35,10 @@ export default function Home() {
       <NextAssessments />
       <AssessmentPerformance />
       {/*
+
       <AssessmentVsVleInteraction />
 */}
+
       <LearningRecommendation />
     </div>
   );
