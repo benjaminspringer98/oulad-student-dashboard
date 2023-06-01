@@ -5,8 +5,8 @@ export default function handler(req, res) {
   const prism = getAssessmentPerformance(
     Number(process.env.NEXT_PUBLIC_ID_STUDENT)
   );
-  prism.then((data) => {
-    return res.status(200).json({ data });
+  prism.then((assessmentPerformance) => {
+    return res.status(200).json({ assessmentPerformance });
   });
 }
 

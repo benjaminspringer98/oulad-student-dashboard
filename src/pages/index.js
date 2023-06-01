@@ -4,6 +4,7 @@ import NextAssessments from "@/components/v2/NextAssessments";
 import AssessmentPerformance from "@/components/v2/AssessmentPerformance";
 import LearningRecommendation from "@/components/v2/LearningRecommendation";
 import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
+import assessmentPerformance from "@/components/v2/AssessmentPerformance";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,8 +23,10 @@ export default function Home({ data }) {
         <RegisteredCourses courses={data.courses} />
         <NextAssessments assessmentData={data.assessmentData} />
       </div>
-      {/*<AssessmentPerformance />
-      <LearningRecommendation />*/}
+      <AssessmentPerformance
+        assessmentPerformance={data.assessmentPerformance}
+      />
+      {/*  <LearningRecommendation />*/}
     </div>
   );
 }
@@ -38,15 +41,16 @@ export async function getServerSideProps() {
   const assessmentDataRes = await fetch(`${baseUrl}/api/v2/getAssessments`);
   const assessmentData = await assessmentDataRes.json();
 
-  /*const assessmentPerformanceRes = await fetch(
+  const assessmentPerformanceRes = await fetch(
     `${baseUrl}/api/v2/getAssessmentPerformance`
   );
-  const assessmentPerformance = await assessmentPerformanceRes.json();*/
+  const assessmentPerformance = await assessmentPerformanceRes.json();
 
   const data = {
     currentDate: currentDate,
     courses: courses,
     assessmentData: assessmentData,
+    assessmentPerformance: assessmentPerformance,
   };
 
   // Pass data to the page via props

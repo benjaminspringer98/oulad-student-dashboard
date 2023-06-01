@@ -22,7 +22,7 @@
 }
 
 .heading-secondary {
-    @apply text-lg sm:text-lg md:text-xl lg:text-xl xl:text-xl 2xl:text-2xl m-3;
+    @apply text-center text-lg sm:text-lg md:text-xl lg:text-xl xl:text-xl 2xl:text-2xl m-3;
 }
 
 .course-over-card {

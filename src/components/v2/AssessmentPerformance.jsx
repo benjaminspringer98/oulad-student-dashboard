@@ -1,13 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Course from "@/components/v2/Course";
-import { Chart as ChartJS } from "chart.js/auto";
 import { Chart, Line } from "react-chartjs-2";
 
-const AssessmentPerformance = () => {
-  async function fetchData() {
-    return await fetch("/api/v2/getAssessmentPerformance");
-  }
-
+const AssessmentPerformance = ({ assessmentPerformance }) => {
   function getAssessmentMeanScore(studentAssessment) {
     let sum = 0;
     let count = 0;
@@ -20,155 +14,87 @@ const AssessmentPerformance = () => {
     return sum / count;
   }
 
-  const [data, setData] = useState();
-
-  useEffect(() => {
-    fetchData()
-      .then((response) => response.json())
-      .then((res) => {
-        console.log(res.data);
-        setData(res.data);
-      });
-  }, []);
-
-  const testData2 = {
-    datasets: [
-      {
-        label: "You",
-        data: [20, 10, 34],
-      },
-      {
-        label: "Course average",
-        data: [40, 10, 40],
-      },
-    ],
-    labels: ["Ass 1", "Ass 2", "Ass 3"],
-  };
-
-  const testData = {
-    datasets: [
-      {
-        label: "You",
-        data: [20, 10, 34],
-      },
-      {
-        label: "Course average",
-        data: [40, 10, 40],
-      },
-    ],
-    labels: ["Ass 1", "Ass 2", "Ass 3", "4", "6"],
-  };
-
-  if (!data) {
-    return <div>Loading...</div>;
-  }
-
-  if (data.length === 0) {
-    return <div>No data</div>;
-  }
-
   // TODO: is returning undefined the best option when student has not handed in assessment? leaves empty spaces in graph
 
   return (
     <div>
-      Your performance:
-      <ul className="flex">
-        {data.map((course) => (
-          <Line
-            key={course.id}
-            title="Title"
-            options={{
-              scales: {
-                x: {
-                  title: {
-                    display: true,
-                    text: "Assessment ID",
+      <h2 className="heading-secondary">Your performance</h2>
+      <div className="flex justify-center flex-col sm:flex-row">
+        {assessmentPerformance.assessmentPerformance.map((course) => (
+          <div
+            key={`${course.code_module} ${course.code_presentation}`}
+            className="w-60 h-60 md:w-72 md:h-72 lg:w-96 lg:h-96 m-4"
+          >
+            <Line
+              key={course.id}
+              title="Title"
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  x: {
+                    title: {
+                      display: true,
+                      text: "Assessment ID",
+                    },
+                  },
+                  y: {
+                    beginAtZero: true,
+                    suggestedMax: 100,
+                    title: {
+                      display: true,
+                      text: "Score",
+                    },
                   },
                 },
-                y: {
-                  beginAtZero: true,
+                plugins: {
                   title: {
                     display: true,
-                    text: "Score",
+                    text: `${course.code_module} ${course.code_presentation}`,
                   },
                 },
-              },
-              plugins: {
-                title: {
-                  display: true,
-                  text: `${course.code_module} ${course.code_presentation}`,
-                },
-              },
-            }}
-            data={{
-              datasets: [
-                {
-                  label: "You",
-                  data: course.course.assessments.map((assessment) => {
-                    const studentAssessment = assessment.studentAssessment.find(
-                      (sa) =>
-                        sa.id_student ===
-                        Number(process.env.NEXT_PUBLIC_ID_STUDENT)
-                    );
-                    return studentAssessment
-                      ? studentAssessment.score
-                      : undefined;
-                  }),
-                },
-                {
-                  label: "Course average",
-                  data: course.course.assessments.map((assessment) =>
-                    assessment.studentAssessment
-                      ? getAssessmentMeanScore(assessment.studentAssessment)
-                      : undefined
-                  ),
-                },
-              ],
-              labels: course.course.assessments.map((assessment) =>
-                assessment.assessment_type === "Exam" &&
-                assessment.studentAssessment.length === 0
-                  ? "Pass/Fail exam"
-                  : assessment.id_assessment
-              ),
-            }}
-          />
+              }}
+              data={{
+                datasets: [
+                  {
+                    label: "You",
+                    borderColor: "#FFB0C1",
+                    backgroundColor: "#FFB0C1",
+                    data: course.course.assessments.map((assessment) => {
+                      const studentAssessment =
+                        assessment.studentAssessment.find(
+                          (sa) =>
+                            sa.id_student ===
+                            Number(process.env.NEXT_PUBLIC_ID_STUDENT)
+                        );
+                      return studentAssessment
+                        ? studentAssessment.score
+                        : undefined;
+                    }),
+                  },
+                  {
+                    label: "Course average",
+                    borderColor: "#93C5FD",
+                    backgroundColor: "#93C5FD",
+                    data: course.course.assessments.map((assessment) =>
+                      assessment.studentAssessment
+                        ? getAssessmentMeanScore(assessment.studentAssessment)
+                        : undefined
+                    ),
+                  },
+                ],
+                labels: course.course.assessments.map((assessment) =>
+                  assessment.assessment_type === "Exam"
+                    ? "Exam"
+                    : assessment.id_assessment
+                ),
+              }}
+            />
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
-
-  /*return (
-    <div>
-      Your performance:
-      <ul className="flex">
-        {data.map((course) => (
-          <li>
-            Course: {`${course.code_module} ${course.code_presentation}`}
-            {course.course.assessments.map((assessment) => (
-              <div>
-                Assessment: {assessment.id_assessment}
-                <p>
-                  Mean Score:
-                  {getAssessmentMeanScore(assessment.studentAssessment)}
-                </p>
-                Your score:
-                {assessment.studentAssessment.find(
-                  (sa) =>
-                    sa.id_student === Number(process.env.NEXT_PUBLIC_ID_STUDENT)
-                )
-                  ? assessment.studentAssessment.find(
-                      (sa) =>
-                        sa.id_student ===
-                        Number(process.env.NEXT_PUBLIC_ID_STUDENT)
-                    ).score
-                  : "not handed in"}
-              </div>
-            ))}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );*/
 };
 
 export default AssessmentPerformance;

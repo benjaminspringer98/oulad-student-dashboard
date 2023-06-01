@@ -17,6 +17,8 @@ const Assessment = ({ assessment }) => {
     );
   }
 
+  // TODO: add different text, when assessment is due today
+
   if (getDaysUntilAssessment(assessment.date) >= 15) {
     return (
       <div className="assessment-card bg-blue-200">
