@@ -3,8 +3,8 @@ import { PrismaClient } from "@prisma/client";
 const currentDate = process.env.NEXT_PUBLIC_CURRENT_DATE;
 export default function handler(req, res) {
   const prism = getAssessments(Number(process.env.NEXT_PUBLIC_ID_STUDENT));
-  prism.then((data) => {
-    return res.status(200).json({ data });
+  prism.then((assessmentData) => {
+    return res.status(200).json({ assessmentData });
   });
 }
 

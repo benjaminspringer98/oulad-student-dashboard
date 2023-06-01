@@ -1,46 +1,54 @@
 import { Inter } from "next/font/google";
-import { useEffect, useState } from "react";
-import Courses from "@/components/Courses";
-import Assessments from "@/components/Assessments";
-import PerformanceDisplay from "@/components/PerformanceDisplay";
-import CoursesDisplay from "@/components/CoursesDisplay";
 import RegisteredCourses from "@/components/v2/RegisteredCourses";
 import NextAssessments from "@/components/v2/NextAssessments";
 import AssessmentPerformance from "@/components/v2/AssessmentPerformance";
-import AssessmentVsVleInteraction from "@/components/v2/AssessmentVsVleInteraction";
 import LearningRecommendation from "@/components/v2/LearningRecommendation";
+import process from "next/dist/build/webpack/loaders/resolve-url-loader/lib/postcss";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function Home() {
-  const [date, setDate] = useState();
-
-  // TODO: cleanup whole app
-  async function getCurrentDate() {
-    return await fetch("/api/v2/getCurrentDate");
+export default function Home({ data }) {
+  function getCurrentDateString() {
+    const today = new Date(data.currentDate);
+    return today.toLocaleDateString();
   }
-
-  useEffect(() => {
-    getCurrentDate()
-      .then((response) => response.json())
-      .then((res) => {
-        //console.log(res)
-        setDate(res.currentDate);
-      });
-  }, []);
 
   return (
     <div>
-      <h1 className="font-bold">Hello, User. Today is {date}</h1>
-      <RegisteredCourses />
-      <NextAssessments />
-      <AssessmentPerformance />
-      {/*
-
-      <AssessmentVsVleInteraction />
-*/}
-
-      <LearningRecommendation />
+      <h1 className="heading-primary">
+        Hello, User. Today is {getCurrentDateString()}
+      </h1>
+      <div className="flex justify-center flex-col sm:flex-row">
+        <RegisteredCourses courses={data.courses} />
+        <NextAssessments assessmentData={data.assessmentData} />
+      </div>
+      {/*<AssessmentPerformance />
+      <LearningRecommendation />*/}
     </div>
   );
+}
+
+export async function getServerSideProps() {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+  const currentDate = process.env.NEXT_PUBLIC_CURRENT_DATE;
+
+  const coursesRes = await fetch(`${baseUrl}/api/v2/getCourses`);
+  const courses = await coursesRes.json();
+
+  const assessmentDataRes = await fetch(`${baseUrl}/api/v2/getAssessments`);
+  const assessmentData = await assessmentDataRes.json();
+
+  /*const assessmentPerformanceRes = await fetch(
+    `${baseUrl}/api/v2/getAssessmentPerformance`
+  );
+  const assessmentPerformance = await assessmentPerformanceRes.json();*/
+
+  const data = {
+    currentDate: currentDate,
+    courses: courses,
+    assessmentData: assessmentData,
+  };
+
+  // Pass data to the page via props
+  return { props: { data } };
 }

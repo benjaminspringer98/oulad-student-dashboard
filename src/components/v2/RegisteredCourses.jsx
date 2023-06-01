@@ -1,35 +1,11 @@
-import React, { useEffect, useState } from "react";
 import Course from "@/components/v2/Course";
 
-const RegisteredCourses = () => {
-  async function fetchData() {
-    return await fetch("/api/v2/getCourses");
-  }
-
-  const [courses, setCourses] = useState();
-
-  useEffect(() => {
-    fetchData()
-      .then((response) => response.json())
-      .then((res) => {
-        //console.log(res.data);
-        setCourses(res.data);
-      });
-  }, []);
-
-  if (!courses) {
-    return <div>Loading...</div>;
-  }
-
-  if (courses.length === 0) {
-    return <div>No courses</div>;
-  }
-
+const RegisteredCourses = ({ courses }) => {
   return (
-    <div>
-      Your courses:
+    <div className="m-4">
+      <h2 className="heading-secondary">Your courses</h2>
       <ul className="flex">
-        {courses.map((course) => (
+        {courses.courses.map((course) => (
           <Course
             course={course}
             key={`${course.code_module} ${course.code_presentation}`}
