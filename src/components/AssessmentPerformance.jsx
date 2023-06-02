@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Chart as ChartJS } from "chart.js/auto";
 import { Chart, Line } from "react-chartjs-2";
 
 const AssessmentPerformance = ({ assessmentPerformance }) => {
@@ -23,7 +24,7 @@ const AssessmentPerformance = ({ assessmentPerformance }) => {
         {assessmentPerformance.assessmentPerformance.map((course) => (
           <div
             key={`${course.code_module} ${course.code_presentation}`}
-            className="w-60 h-60 md:w-72 md:h-72 lg:w-96 lg:h-96 m-4"
+            className="w-60 h-60 md:w-72 md:h-72 lg:w-80 lg:h-80 m-4"
           >
             <Line
               key={course.id}

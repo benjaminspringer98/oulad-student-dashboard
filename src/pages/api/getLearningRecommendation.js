@@ -6,8 +6,8 @@ export default function handler(req, res) {
   const prism = getLearningRecommendation(
     Number(process.env.NEXT_PUBLIC_ID_STUDENT)
   );
-  prism.then((data) => {
-    return res.status(200).json({ data });
+  prism.then((learningRecommendationData) => {
+    return res.status(200).json({ learningRecommendationData });
   });
 }
 
@@ -83,7 +83,6 @@ async function getLearningRecommendation(studentId) {
     console.log(`uniqueStudents length: ${uniqueStudents.length}`);
 
     // get ids of students who were >= percentage better than current student
-    // TODO: what happens when no students are better than current student?
     let studentsBetterThanCurrent = [];
     uniqueStudents.forEach((idStudent) => {
       const meanScore = getStudentMeanScore(
@@ -93,9 +92,9 @@ async function getLearningRecommendation(studentId) {
 
       //console.log(`student ${idStudent} meanScore: ${meanScore}`);
       if (meanScore >= studentMeanScore * (1 + percentage)) {
-        console.log(
+        /* console.log(
           `student ${idStudent} with mean score ${meanScore} was at least 10% better than current student ${studentId} with mean score ${studentMeanScore}`
-        );
+        );*/
         studentsBetterThanCurrent.push(idStudent);
       }
     });

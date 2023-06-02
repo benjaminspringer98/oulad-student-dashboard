@@ -62,7 +62,7 @@ export default function Course({ course }) {
         <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
           {course.code_module}
         </h5>
-        over
+        <p>over</p>
       </div>
     );
   } else {

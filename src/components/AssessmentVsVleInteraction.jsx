@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Course from "@/components/v2/Course";
+import Course from "@/components/Course";
 import { Chart as ChartJS } from "chart.js/auto";
 import { Bar, Chart, Line } from "react-chartjs-2";
 

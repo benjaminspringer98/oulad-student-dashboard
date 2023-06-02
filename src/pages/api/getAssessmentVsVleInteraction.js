@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import assessmentPerformance from "@/components/v2/AssessmentPerformance";
 
 const currentDate = process.env.NEXT_PUBLIC_CURRENT_DATE;
 export default function handler(req, res) {

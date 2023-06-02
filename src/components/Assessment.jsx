@@ -35,16 +35,23 @@ const Assessment = ({ assessment }) => {
     );
   } else if (getDaysUntilAssessment(assessment.date) >= 3) {
     return (
-      <div className="assessment-card bg-yellow-300">
+      <div className="assessment-card bg-orange-300">
+        {assessmentInfo(assessment)}
+        <p>due in {getDaysUntilAssessment()} days</p>
+      </div>
+    );
+  } else if (getDaysUntilAssessment(assessment.date) > 0) {
+    return (
+      <div className="assessment-card bg-red-300">
         {assessmentInfo(assessment)}
         <p>due in {getDaysUntilAssessment()} days</p>
       </div>
     );
   } else {
     return (
-      <div className="assessment-card bg-red-300">
+      <div className="assessment-card bg-red-400">
         {assessmentInfo(assessment)}
-        <p>due in {getDaysUntilAssessment()} days</p>
+        <p>due today!</p>
       </div>
     );
   }

@@ -25,6 +25,10 @@
     @apply text-center text-lg sm:text-lg md:text-xl lg:text-xl xl:text-xl 2xl:text-2xl m-3;
 }
 
+.heading-tertiary {
+  @apply text-center text-base sm:text-base md:text-lg lg:text-lg xl:text-lg 2xl:text-xl m-3;
+}
+
 .course-over-card {
   @apply block max-w-sm p-7 m-2 bg-gray-400 border border-gray-200 rounded-2xl shadow;
 }
@@ -37,3 +41,6 @@
   @apply block max-w-sm p-4 m-2 border border-gray-200 rounded-2xl shadow
 }
 
+.recommendation-card {
+  @apply flex items-center block max-w-sm p-2 m-2 bg-yellow-200 border border-gray-200 rounded-2xl shadow
+}
