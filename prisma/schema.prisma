@@ -5,13 +5,6 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// mac db url: file:/Users/benni/Dev/databases/OULAD/OULAD.db
-
-datasource db {
-  provider = "sqlite"
-  url      = "file:C:\\Users\\BenjaminSpringer\\Learning Analytics Technical\\databases\\OULAD\\OULAD.db"
-}
-
 model courses {
   code_module                String
   code_presentation          String
