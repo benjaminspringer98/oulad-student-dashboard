@@ -1,4 +1,4 @@
-This is the Learning Analytics Dashboard (LAD) developed for the seminar
+This is the prototype Learning Analytics Dashboard (LAD) developed for the seminar
 Learning Analytics and Educational Data Mining at the University of Goettingen, as part of the M.Sc. in Business Information Systems. 
 It consists of a Web-App and a SQLite database with the Open University Learning Analytics Dataset (OULAD). 
 As the database is too large to include here, setup instructions are provided below.
